@@ -1,0 +1,28 @@
+import { hasOwn } from "../shared/index";
+
+const publicPropertiesMap = {
+    $el:(i) => i.vnode.el,
+    $slots:(i) => i.slots,
+    $props:(i) => i.props,
+}
+
+
+export const PublicInstanceProxyHandlers = {
+    get({_:instance},key) {
+        const {setupState,props} = instance;
+        
+        //判断某个对象上是否有某个值
+
+        if (hasOwn(setupState,key)) {
+            return setupState[key]
+        } else if (hasOwn(props,key)) {
+            return props[key]
+        }
+
+        const publicGetter = publicPropertiesMap[key];
+        if (publicGetter) {
+            return publicGetter(instance)
+        }
+        //后续还可以实现各种$
+    }
+}
